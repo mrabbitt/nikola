@@ -29,7 +29,9 @@ import os
 
 try:
     from markdown import markdown
-    # from nikola.plugins.compile_markdown import nikola
+    from nikola.plugins.compile_markdown.nikola_md import NikolaExtension
+    nikola_extension = NikolaExtension()
+
 except ImportError:
     markdown = None
 
@@ -41,7 +43,7 @@ class CompileMarkdown(PageCompiler):
 
     name = "markdown"
 
-    extensions = ['fenced_code', 'codehilite', 'nikola_md']
+    extensions = ['fenced_code', 'codehilite', nikola_extension]
 
     def compile_html(self, source, dest):
         if markdown is None:
