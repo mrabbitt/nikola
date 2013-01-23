@@ -62,6 +62,9 @@ The destination folder must not exist.
     "rest": ('.txt', '.rst'),
     "markdown": ('.md', '.mdown', '.markdown'),
     "textile": ('.textile',),
+    "txt2tags": ('.t2t',),
+    "bbcode": ('.bb',),
+    "wiki": ('.wiki',),
     "html": ('.html', '.htm')
     }""",
         'REDIRECTIONS': '[]',
