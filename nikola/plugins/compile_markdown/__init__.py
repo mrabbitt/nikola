@@ -33,7 +33,7 @@ try:
     nikola_extension = NikolaExtension()
 
 except ImportError:
-    markdown = None
+    markdown = None  # NOQA
 
 from nikola.plugin_categories import PageCompiler
 
@@ -47,7 +47,8 @@ class CompileMarkdown(PageCompiler):
 
     def compile_html(self, source, dest):
         if markdown is None:
-            raise Exception('To build this site, you need to install the "markdown" package.')
+            raise Exception('To build this site, you need to install the '
+                            '"markdown" package.')
         try:
             os.makedirs(os.path.dirname(dest))
         except:
@@ -58,7 +59,8 @@ class CompileMarkdown(PageCompiler):
             output = markdown(data, self.extensions)
             out_file.write(output)
 
-    def create_post(self, path, onefile=False, title="", slug="", date="", tags=""):
+    def create_post(self, path, onefile=False, title="", slug="", date="",
+                    tags=""):
         with codecs.open(path, "wb+", "utf8") as fd:
             if onefile:
                 fd.write('<!-- \n')

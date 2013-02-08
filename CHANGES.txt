@@ -1,9 +1,10 @@
-New in Master
-=============
+New in 5.2
+==========
 
 Features
 --------
 
+* New vimeo directive for restructured text.
 * New COMMENTS_IN_GALLERIES and COMMENTS_IN_STORIES options.
 * One-page, dynamic-loading, client-rendered site plugin (task_mustache)
 * Local search based on Tipue (extra_plugins/task_localsearch)
@@ -20,10 +21,21 @@ Features
 * Using the filename as slug if no slug is found in the metadata.
 * Make it possible to extract metadata from filename by using regexp.
 * When using import_wordpress users can exclude drafts with the ``-d`` switch.
+* New STORY_INDEX option to generate index.html in story folders.
+* Sort tags case insensitive.
+* New polish translation.
+* Add multi size favicon support.
+* Use multilingual Disqus (although it doesn't seem to work)
+* Add Simplified Chinese translations.
+* (Rough) Blogger/Blogspot importer
+* When running the init command it now creates an empty site by default.
+  The previous behaviour can be triggered with the "--demo" switch.
+* Python 3 support (except for sitemap generation)
 
 Bugfixes
 --------
 
+* Added sane defaults for most options, so you can have a lean config file.
 * Made layout of the site theme responsive, with collapsing navbar.
 * Use timeline instead of parsing post_pages in generic_page_renderer and task_render_pages.
 * Updated disqus integration code, added identifiers so it works on any URL.
@@ -39,6 +51,7 @@ Bugfixes
 * Always ensure the folder for the new post exists.
 * Get title from filename if not available in metadata.
 * Don't copy sources if they end in ".html"
+* Don't link to unexisting translations.
 
 New in v5.1
 ===========

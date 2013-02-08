@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Roberto Alsina y otros.
+# Copyright (c) 2013 Damian Avila.
 
 # Permission is hereby granted, free of charge, to any
 # person obtaining a copy of this software and associated
@@ -22,49 +22,77 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-"""Implementation of compile_html based on textile."""
+"""Implementation of compile_html based on nbconvert."""
 
+from __future__ import unicode_literals, print_function
 import codecs
 import os
 
 try:
-    from creole import Parser
-    from creole.html_emitter import HtmlEmitter
-    creole = True
+    from .nbformat import current as nbformat
+    from .nbconvert.converters import bloggerhtml as nbconverter
+    bloggerhtml = True
 except ImportError:
-    creole = None
+    bloggerhtml = None
 
 from nikola.plugin_categories import PageCompiler
 
 
-class CompileTextile(PageCompiler):
-    """Compile textile into HTML."""
+class CompileIPynb(PageCompiler):
+    """Compile IPynb into HTML."""
 
-    name = "wiki"
+    name = "ipynb"
 
     def compile_html(self, source, dest):
-        if creole is None:
-            raise Exception('To build this site, you need to install the '
-                            '"creole" package.')
+        if bloggerhtml is None:
+            raise Exception('To build this site, you also need '
+                            'https://github.com/damianavila/com'
+                            'pile_ipynb-for-Nikola.git.')
         try:
             os.makedirs(os.path.dirname(dest))
         except:
             pass
+        converter = nbconverter.ConverterBloggerHTML()
         with codecs.open(dest, "w+", "utf8") as out_file:
             with codecs.open(source, "r", "utf8") as in_file:
                 data = in_file.read()
-                document = Parser(data).parse()
-            output = HtmlEmitter(document).emit()
+                converter.nb = nbformat.reads_json(data)
+            output = converter.convert()
             out_file.write(output)
 
     def create_post(self, path, onefile=False, title="", slug="", date="",
                     tags=""):
-        if onefile:
-            raise Exception('There are no comments in CreoleWiki markup, so '
-                            'one-file format is not possible, use the -2 '
-                            'option.')
         d_name = os.path.dirname(path)
         if not os.path.isdir(d_name):
             os.makedirs(os.path.dirname(path))
+        meta_path = os.path.join(d_name, slug + ".meta")
+        with codecs.open(meta_path, "wb+", "utf8") as fd:
+            if onefile:
+                fd.write('%s\n' % title)
+                fd.write('%s\n' % slug)
+                fd.write('%s\n' % date)
+                fd.write('%s\n' % tags)
+        print("Your post's metadata is at: ", meta_path)
         with codecs.open(path, "wb+", "utf8") as fd:
-            fd.write("Write your post here.")
+            fd.write("""{
+ "metadata": {
+  "name": "%s"
+ },
+ "nbformat": 3,
+ "nbformat_minor": 0,
+ "worksheets": [
+  {
+   "cells": [
+    {
+     "cell_type": "code",
+     "collapsed": false,
+     "input": [],
+     "language": "python",
+     "metadata": {},
+     "outputs": []
+    }
+   ],
+   "metadata": {}
+  }
+ ]
+}""" % slug)
