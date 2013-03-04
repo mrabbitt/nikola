@@ -29,11 +29,17 @@ import os
 
 try:
     from markdown import markdown
-    from nikola.plugins.compile_markdown.nikola_md import NikolaExtension
+
+    from nikola.plugins.compile_markdown.mdx_nikola import NikolaExtension
     nikola_extension = NikolaExtension()
 
-except ImportError:
-    markdown = None  # NOQA
+    from nikola.plugins.compile_markdown.mdx_gist import GistExtension
+    gist_extension = GistExtension()
+
+except ImportError, e:
+    markdown = None
+    nikola_extension = None
+    gist_extension = None
 
 from nikola.plugin_categories import PageCompiler
 
@@ -43,7 +49,8 @@ class CompileMarkdown(PageCompiler):
 
     name = "markdown"
 
-    extensions = ['fenced_code', 'codehilite', nikola_extension]
+    extensions = ['fenced_code', 'codehilite', gist_extension,
+                  nikola_extension]
 
     def compile_html(self, source, dest):
         if markdown is None:
