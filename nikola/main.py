@@ -41,6 +41,11 @@ def main(args):
     sys.path.append('')
     try:
         import conf
+        if sys.version_info[0] > 2:
+            from imp import reload as _reload
+        else:
+            _reload = reload  # NOQA
+        _reload(conf)
         config = conf.__dict__
     except ImportError:
         config = {}

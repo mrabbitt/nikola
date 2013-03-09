@@ -1,7 +1,7 @@
 The Nikola Handbook
 ===================
 
-:Version: 5.3
+:Version: 5.4.2
 :Author: Roberto Alsina <ralsina@netmanagers.com.ar>
 
 .. class:: alert alert-info pull-right
@@ -17,7 +17,7 @@ After you have Nikola installed:
 Create a empty site:
     ``nikola init mysite``
 
-You can create a site with demo files in it with ``nikola init mysite --demo``
+You can create a site with demo files in it with ``nikola init --demo mysite``
 
 The rest of these commands have to be executed inside the new ``mysite`` folder.
 
@@ -572,7 +572,7 @@ You surely want to edit these options::
 
     # Data about this site
     BLOG_TITLE = "Demo Site"
-    BLOG_URL = "http://nikola.ralsina.com.ar"
+    SITE_URL = "http://nikola.ralsina.com.ar"
     BLOG_EMAIL = "joe@demo.site"
     BLOG_DESCRIPTION = "This is a demo site for Nikola."
 
@@ -717,6 +717,10 @@ Disqus is a good option because:
    them with you if you need to.
 3) It's free.
 4) It's damn nice.
+
+You can disable comments for a post by adding a "nocomments" metadata field to it::
+
+    .. nocomments: True
 
 .. admonition:: Important
 

@@ -1,5 +1,34 @@
-New in Master
+New in master
 =============
+
+Features
+--------
+
+* New "nocomments" metadata that disables comments for a page/post (Issue #278).
+* New HIDE_UNTRANSLATED_POSTS option (does nothing yet)
+
+Bugfixes
+--------
+
+* Set locale to the value of "lang" in templates, so things like strftime 
+  use localized values. (Issue #368)
+* Fixed console command.
+* Cleaned up arbitrary metadata.
+* Don't crash in posts without actual post text.
+* Nicer tag listing.
+* Fixed unicode bug in markdown compiler.
+
+New in 5.4.2
+============
+
+Bugfixes
+--------
+
+* Fix relative paths when stories is "dropped to root" (Issue #362)
+* Pick translated titles in 1-file posts (Issue #365)
+
+New in 5.4
+==========
 
 Features
 --------
@@ -35,6 +64,7 @@ Bugfixes
 * Metadata handling cleanups by Tordek
 * Fixed blockquote font size inconsistency
 * Wordpress Import: Do not break indentation (issue #189)
+* Make things work even if SITE_URL has a path (Fix #307)
 
 New in 5.3
 ==========

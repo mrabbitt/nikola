@@ -28,6 +28,7 @@ from collections import defaultdict
 from copy import copy
 import glob
 import gzip
+import locale
 import os
 import sys
 try:
@@ -83,7 +84,6 @@ class Nikola(object):
             self.configured = True
 
         # This is the default config
-        # TODO: fill it
         self.config = {
             'ADD_THIS_BUTTONS': True,
             'ANALYTICS': '',
@@ -105,6 +105,7 @@ class Nikola(object):
             'GALLERY_PATH': 'galleries',
             'GZIP_FILES': False,
             'GZIP_EXTENSIONS': ('.txt', '.htm', '.html', '.css', '.js', '.json'),
+            'HIDE_UNTRANSLATED_POSTS': False,
             'INDEX_DISPLAY_POST_COUNT': 10,
             'INDEX_TEASERS': False,
             'INDEXES_TITLE': "",
@@ -114,6 +115,7 @@ class Nikola(object):
             'LISTINGS_FOLDER': 'listings',
             'MAX_IMAGE_SIZE': 1280,
             'MATHJAX_CONFIG': '',
+            'OLD_THEME_SUPPORT': True,
             'OUTPUT_FOLDER': 'output',
             'post_compilers': {
                 "rest": ('.txt', '.rst'),
@@ -163,7 +165,6 @@ class Nikola(object):
         if 'SITE_URL' not in self.config:
             if 'BLOG_URL' in self.config:
                 print("WARNING: You should configure SITE_URL instead of BLOG_URL")
-                print("See docs at FIXME put URL")
                 self.config['SITE_URL'] = self.config['BLOG_URL']
 
         # BASE_URL defaults to SITE_URL
@@ -211,6 +212,7 @@ class Nikola(object):
 
         self.GLOBAL_CONTEXT['messages'] = self.MESSAGES
         self.GLOBAL_CONTEXT['_link'] = self.link
+        self.GLOBAL_CONTEXT['set_locale'] = s_l
         self.GLOBAL_CONTEXT['rel_link'] = self.rel_link
         self.GLOBAL_CONTEXT['abs_link'] = self.abs_link
         self.GLOBAL_CONTEXT['exists'] = self.file_exists
@@ -330,10 +332,12 @@ class Nikola(object):
         url_part = output_name.decode('utf8')[len(self.config["OUTPUT_FOLDER"])
                                               + 1:]
 
-        # This is to support windows paths
-        url_part = "/".join(url_part.split(os.sep))
-
-        src = urljoin(self.config["BASE_URL"], url_part)
+        # Treat our site as if output/ is "/" and then make all URLs relative,
+        # making the site "relocatable"
+        src = os.sep + url_part
+        src = os.path.normpath(src)
+        # The os.sep is because normpath will change "/" to "\" on windows
+        src = "/".join(src.split(os.sep))
 
         parsed_src = urlsplit(src)
         src_elems = parsed_src.path.split('/')[1:]
@@ -612,11 +616,11 @@ class Nikola(object):
                     for lang, langpath in list(
                             self.config['TRANSLATIONS'].items()):
                         dest = (destination, langpath, dir_glob,
-                                post.pagenames[lang])
+                                post.meta[lang]['slug'])
                         if dest in targets:
                             raise Exception('Duplicated output path {0!r} '
                                             'in post {1!r}'.format(
-                                                post.pagenames[lang],
+                                                post.meta[lang]['slug'],
                                                 base_path))
                         targets.add(dest)
                     self.global_data[post.post_name] = post
@@ -627,6 +631,8 @@ class Nikola(object):
                             self.posts_per_tag[tag].append(post.post_name)
                     else:
                         self.pages.append(post)
+                    if self.config['OLD_THEME_SUPPORT']:
+                        post._add_old_metadata()
         for name, post in list(self.global_data.items()):
             self.timeline.append(post)
         self.timeline.sort(key=lambda p: p.date)
@@ -698,7 +704,7 @@ class Nikola(object):
         context["nextlink"] = None
         context.update(extra_context)
         deps_context = copy(context)
-        deps_context["posts"] = [(p.titles[lang], p.permalink(lang)) for p in
+        deps_context["posts"] = [(p.meta[lang]['title'], p.permalink(lang)) for p in
                                  posts]
         deps_context["global"] = self.GLOBAL_CONTEXT
         task = {
@@ -712,3 +718,8 @@ class Nikola(object):
         }
 
         return utils.apply_filters(task, filters)
+
+def s_l(lang):
+    """A set_locale that uses utf8 encoding and returns ''."""
+    locale.setlocale(locale.LC_ALL, (lang, "utf8"))
+    return ''
